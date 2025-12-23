@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lyujp.heziservice.mapper.UserMapper">
+
+    <!-- 登录-->
+    <select id="login" resultType="java.lang.Long">
+        SELECT id FROM user_info WHERE username=#{username} and password_sha512=#{password}
+    </select>
+
+<!--    添加登录日志-->
+    <update id="addLoginLog">
+        INSERT INTO login_log (user_id,success,create_at,ip)
+        VALUES (#{userId},#{success},now(),#{ip})
+    </update>
+
+<!--    获取失败登录数量-->
+    <select id="getFailedLoginAttempt">
+        SELECT COUNT(*) FROM login_log WHERE IP =#{ip} and create_at > now()  - INTERVAL'${minutes}' MINUTE AND success=0
+    </select>
+
+<!--    获取用户信息-->
+    <select id="getUserInfo">
+        SELECT id,username,nickname,avatar,create_at,status FROM user_info WHERE id = #{userId}
+    </select>
+
+<!--    获取用户密码盐-->
+    <select id="getUserSalt">
+        SELECT salt FROM user_info WHERE username= #{username}
+    </select>
+
+<!--    获取用户数量-->
+    <select id="getUserCount">
+        SELECT COUNT(*) FROM user_info
+    </select>
+
+<!--    添加管理员-->
+    <select id="addAdmin">
+        INSERT INTO user_info (username,password_sha512,nickname,avatar,create_at,status,salt) VALUES
+          (#{username},#{password},'Admin','',NOW(),1,#{salt})
+    </select>
+</mapper>
