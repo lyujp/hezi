@@ -2,16 +2,17 @@ package com.lyujp.heziservice.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.lyujp.heziservice.config.ABS_CONFIG;
 import com.lyujp.heziservice.dto.ResDto;
 import com.lyujp.heziservice.dto.UserInfoDto;
 import com.lyujp.heziservice.mapper.UserMapper;
+import com.lyujp.heziservice.util.BlankHelper;
 import com.lyujp.heziservice.util.IpHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Random;
 
@@ -21,8 +22,24 @@ public class UserController {
 
     private final UserMapper userMapper;
 
-    @RequestMapping("/login/{username}/{password}")
-    public ResDto<Void> login(@PathVariable String username, @PathVariable String password, HttpServletRequest httpServletRequest){
+    @PostMapping("/login")
+    public ResDto<Void> login(@RequestBody String loginInfo, HttpServletRequest httpServletRequest){
+        if(loginInfo == null){
+            return ResDto.fail("参数不得为空");
+        }
+        JSONObject loginInfoJson;
+        String username;
+        String password;
+        try{
+            loginInfoJson = JSONUtil.parseObj(loginInfo);
+            username = loginInfoJson.getStr("username");
+            password = loginInfoJson.getStr("password");
+            if(BlankHelper.strIsBlank(username) || BlankHelper.strIsBlank(password)){
+                return ResDto.fail("用户名或密码不得为空");
+            }
+        }catch (Exception ignore){
+            return ResDto.fail("参数错误");
+        }
         Long failedCount = userMapper.getFailedLoginAttempt(IpHelper.getIp(httpServletRequest), ABS_CONFIG.LOGIN_ATTEMPT_MINUTES);
         if(failedCount > 10) return ResDto.fail(403,"超过最大尝试次数");
         String userSalt = userMapper.getUserSalt(username);
