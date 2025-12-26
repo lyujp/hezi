@@ -1,8 +1,7 @@
 package com.lyujp.heziservice.exception;
 
 import cn.dev33.satoken.exception.NotLoginException;
-import cn.dev33.satoken.util.SaResult;
-import com.lyujp.heziservice.dto.ResDto;
+import com.lyujp.heziservice.dto.common.ResDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,7 +43,7 @@ public class GlobalException {
         }
 
         // 返回给前端
-        return ResDto.fail(message);
+        return ResDto.fail(403,message);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)

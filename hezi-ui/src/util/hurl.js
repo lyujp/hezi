@@ -1,6 +1,4 @@
 import config from '../config.js';
-import {useRouter} from "vue-router";
-const router = useRouter();
 const apiHttp = {
   // GET请求方法
   get: async function (endpoint, params = {}) {
@@ -27,7 +25,7 @@ const apiHttp = {
       const data =await response.json();
       if(data.code === 403){
           console.warn('接收到403状态码，跳转到登录页面');
-          await router.push('/login');
+          window.location.href = '/login';
           return;
       }
       return data;
@@ -57,7 +55,7 @@ const apiHttp = {
         const responseData =await response.json();
         if(responseData.code === 403){
             console.warn('接收到403状态码，跳转到登录页面');
-            await router.push('/login');
+            window.location.href = '/login';
             return;
         }
         return responseData;

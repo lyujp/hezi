@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lyujp.heziservice.mapper.WorkbenchMapper">
+
+    <select id="getList">
+        SELECT id,title,subtitle,img,url,category_id,status FROM workbench
+    </select>
+
+    <insert id="add">
+        INSERT INTO workbench (title,subtitle,img,url,category_id,status) VALUES
+            (#{title},#{subtitle},#{img},#{url},#{category_id},#{status})
+    </insert>
+
+    <update id="edit">
+        UPDATE workbench SET
+                title=#{title},subtitle=#{subtitle},img=#{img},
+                url=#{url},category_id=#{categoryId},status=#{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from workbench WHERE id = #{id}
+    </delete>
+
+    <select id="getCategoryList">
+        SELECT id,"name",weight,status FROM workbench_category ORDER BY weight ASC
+    </select>
+
+    <insert id="addCategory">
+        INSERT INTO workbench_category ("name",weight,status) VALUES
+                        (#{name},#{weight},#{status})
+    </insert>
+
+    <update id="editCategory">
+        UPDATE workbench_category SET
+               "name"=#{name},weight=#{weight},status=#{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteCategory">
+        DELETE FROM workbench_category WHERE id = #{id}
+    </delete>
+</mapper>

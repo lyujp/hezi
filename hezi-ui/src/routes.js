@@ -21,6 +21,10 @@ const routes = [
             },
         ]
     },
+    {
+        path: '/workbench',
+        component: () => import('./view/common/Workbench.vue'),
+    }
 ]
 
 const router = createRouter({

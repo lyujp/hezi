@@ -30,7 +30,7 @@ const submit = () => {
     if(res.code === 200){
       showMsg('success','登录成功')
       setTimeout(()=>{
-        router.push('/')
+        router.push('/workbench')
       },1000)
     }else{
       showMsg('error',res.message)

@@ -1,8 +1,6 @@
 package com.lyujp.heziservice.mapper;
 
-import com.lyujp.heziservice.dto.UserInfoDto;
-
-import java.util.List;
+import com.lyujp.heziservice.dto.common.UserInfoDto;
 
 public interface UserMapper {
     Long login(String username, String password);
@@ -11,5 +9,5 @@ public interface UserMapper {
     UserInfoDto getUserInfo(Long userId);
     String getUserSalt(String username);
     Long getUserCount();
-    Long addAdmin(String username, String password, String salt);
+    void addAdmin(String username, String password, String salt);
 }

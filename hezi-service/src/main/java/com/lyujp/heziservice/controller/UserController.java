@@ -2,13 +2,11 @@ package com.lyujp.heziservice.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.lyujp.heziservice.config.ABS_CONFIG;
-import com.lyujp.heziservice.dto.ResDto;
-import com.lyujp.heziservice.dto.UserInfoDto;
+import com.lyujp.heziservice.dto.common.LoginDto;
+import com.lyujp.heziservice.dto.common.ResDto;
+import com.lyujp.heziservice.dto.common.UserInfoDto;
 import com.lyujp.heziservice.mapper.UserMapper;
-import com.lyujp.heziservice.util.BlankHelper;
 import com.lyujp.heziservice.util.IpHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,18 +21,16 @@ public class UserController {
     private final UserMapper userMapper;
 
     @PostMapping("/login")
-    public ResDto<Void> login(@RequestBody String loginInfo, HttpServletRequest httpServletRequest){
-        if(loginInfo == null){
+    public ResDto<Void> login(@RequestBody LoginDto loginDto, HttpServletRequest httpServletRequest){
+        if(loginDto == null){
             return ResDto.fail("参数不得为空");
         }
-        JSONObject loginInfoJson;
-        String username;
-        String password;
+        String username = "";
+        String password = "";
         try{
-            loginInfoJson = JSONUtil.parseObj(loginInfo);
-            username = loginInfoJson.getStr("username");
-            password = loginInfoJson.getStr("password");
-            if(BlankHelper.strIsBlank(username) || BlankHelper.strIsBlank(password)){
+            username = loginDto.getUsername();
+            password = loginDto.getPassword();
+            if(username == null || username.isBlank() || password == null || password.isBlank()){
                 return ResDto.fail("用户名或密码不得为空");
             }
         }catch (Exception ignore){
@@ -57,7 +53,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping("/logout")
+    @PostMapping("/logout")
     public ResDto<Void> logout(){
         StpUtil.logout();
         return ResDto.success();
@@ -67,6 +63,9 @@ public class UserController {
     public ResDto<Void> addAdmin(@PathVariable String username,@PathVariable String password){
         Long userCount = userMapper.getUserCount();
         if(userCount == 0){
+            if(username == null || username.isBlank() || password == null || password.isBlank()){
+                return ResDto.fail(500,"参数不得为空");
+            }
             Random random = new Random();
             String salt = String.valueOf(random.nextInt(10000,99999));
             userMapper.addAdmin(username, DigestUtil.sha512Hex(password + salt), salt);
@@ -75,12 +74,12 @@ public class UserController {
         return ResDto.fail(500);
     }
 
-    @RequestMapping("/admin/userinfo")
+    @RequestMapping("/admin/user/userinfo")
     public ResDto<UserInfoDto> getUserInfo(){
         return ResDto.success(userMapper.getUserInfo(Long.parseLong(StpUtil.getLoginId(-1).toString())));
     }
 
-    @RequestMapping("/check_login")
+    @PostMapping("/check_login")
     public ResDto<Void> checkLogin(){
         if(StpUtil.isLogin()){
             return ResDto.success(StpUtil.getTokenValue());

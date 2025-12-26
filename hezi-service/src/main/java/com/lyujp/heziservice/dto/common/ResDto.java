@@ -1,4 +1,4 @@
-package com.lyujp.heziservice.dto;
+package com.lyujp.heziservice.dto.common;
 
 import lombok.Data;
 
