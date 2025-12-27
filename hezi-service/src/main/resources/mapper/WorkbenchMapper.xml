@@ -9,7 +9,7 @@
         SELECT id,title,subtitle,img,url,category_id,status FROM workbench
     </select>
 
-    <insert id="add">
+    <insert id="add" useGeneratedKeys="true" keyProperty="id" >
         INSERT INTO workbench (title,subtitle,img,url,category_id,status) VALUES
             (#{title},#{subtitle},#{img},#{url},#{category_id},#{status})
     </insert>
@@ -29,7 +29,7 @@
         SELECT id,"name",weight,status FROM workbench_category ORDER BY weight ASC
     </select>
 
-    <insert id="addCategory">
+    <insert id="addCategory" useGeneratedKeys="true" keyProperty="id" >
         INSERT INTO workbench_category ("name",weight,status) VALUES
                         (#{name},#{weight},#{status})
     </insert>

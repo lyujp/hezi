@@ -1,9 +1,10 @@
 package com.lyujp.heziservice.mapper;
 
+import com.lyujp.heziservice.dto.common.LoginDto;
 import com.lyujp.heziservice.dto.common.UserInfoDto;
 
 public interface UserMapper {
-    Long login(String username, String password);
+    Long login(LoginDto loginDto);
     void addLoginLog(String ip, Long success, Long userId);
     Long getFailedLoginAttempt(String ip, Long minutes);
     UserInfoDto getUserInfo(Long userId);

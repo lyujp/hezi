@@ -25,24 +25,18 @@ public class UserController {
         if(loginDto == null){
             return ResDto.fail("参数不得为空");
         }
-        String username = "";
-        String password = "";
-        try{
-            username = loginDto.getUsername();
-            password = loginDto.getPassword();
-            if(username == null || username.isBlank() || password == null || password.isBlank()){
-                return ResDto.fail("用户名或密码不得为空");
-            }
-        }catch (Exception ignore){
-            return ResDto.fail("参数错误");
+        if(loginDto.getUsername() == null || loginDto.getUsername().isBlank()
+                || loginDto.getPassword() == null || loginDto.getPassword().isBlank()){
+            return ResDto.fail("用户名或密码不得为空");
         }
         Long failedCount = userMapper.getFailedLoginAttempt(IpHelper.getIp(httpServletRequest), ABS_CONFIG.LOGIN_ATTEMPT_MINUTES);
         if(failedCount > 10) return ResDto.fail(403,"超过最大尝试次数");
-        String userSalt = userMapper.getUserSalt(username);
+        String userSalt = userMapper.getUserSalt(loginDto.getUsername());
         if(userSalt == null){
             return ResDto.fail("用户名或密码错误");
         }
-        Long userId = userMapper.login(username, DigestUtil.sha512Hex(password+userSalt));
+        loginDto.setPassword(DigestUtil.sha512Hex(loginDto.getPassword()+userSalt));
+        Long userId = userMapper.login(loginDto);
         if(userId != null){
             StpUtil.login(userId);
             userMapper.addLoginLog(IpHelper.getIp(httpServletRequest),1L,userId);

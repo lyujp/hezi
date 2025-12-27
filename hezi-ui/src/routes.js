@@ -24,6 +24,29 @@ const routes = [
     {
         path: '/workbench',
         component: () => import('./view/common/Workbench.vue'),
+        meta: {
+            title: '工作台'
+        }
+    },
+    {
+        path: '/expense',
+        component: () => import('./view/expense/Index.vue'),
+        children: [
+            {
+                path: '',
+                component: () => import('./view/expense/Home.vue'),
+                meta: {
+                    title: '总览 - 记账系统'
+                }
+            },
+            {
+                path: 'record',
+                component: () => import('./view/expense/Record.vue'),
+                meta: {
+                    title: '记账 - 记账系统'
+                }
+            },
+        ]
     }
 ]
 

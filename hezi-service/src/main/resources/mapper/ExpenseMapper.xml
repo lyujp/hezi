@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lyujp.heziservice.mapper.ExpenseMapper">
+    <select id="getSummary">
+        SELECT COALESCE(SUM(CASE WHEN trade_type =1 THEN amount ELSE 0 END),0) AS all_spending,
+               COALESCE(SUM(CASE WHEN trade_type =2 THEN amount ELSE 0 END),0) AS all_income,
+               COALESCE(SUM(CASE WHEN trade_type =1 AND trade_time >= DATE_TRUNC('month', CURRENT_DATE)::DATE THEN
+                   amount ELSE 0 END),0) AS spending_monthly,
+               COALESCE(SUM(CASE WHEN trade_type =2 THEN amount ELSE 0 END),0) -
+                COALESCE(SUM(CASE WHEN trade_type =1 THEN amount ELSE 0 END),0) AS balance
+        FROM expense_daily_trade
+        WHERE user_id=#{userId}
+    </select>
+
+    <select id="getCategory">
+        SELECT id,category_name,category_type,parent_id,create_at,status FROM expense_category WHERE status = 1
+    </select>
+
+    <select id="getAccount">
+        SELECT id,user_id,account_name,account_type,currency_id,balance,remark,create_at,status
+        FROM expense_account WHERE status = 1 AND user_id = #{userId}
+    </select>
+
+<!--    记录每日交易流水-->
+    <insert id="recordDailyTrade" useGeneratedKeys="true" keyProperty="id" >
+        INSERT INTO expense_daily_trade (user_id,account_id,category_id,trade_type,amount,create_at,currency_id,remark,trade_time)
+            VALUES (#{userId},#{accountId},#{categoryId},#{tradeType},#{amount},NOW(),#{currencyId},#{remark},#{tradeTime});
+    </insert>
+
+<!--    记录账户交易流水-->
+    <insert id="recordAccountFlow" useGeneratedKeys="true" keyProperty="id" >
+        INSERT INTO expense_account_flow (account_id,trade_id,recurring_exec_id,before_balance,after_balance,amount,flow_type,remark,create_at,trade_at)
+        VALUES (#{accountId},#{tradeId},#{recurringExecId}, #{beforeBalance}, #{afterBalance},#{amount},#{flowType},#{remark},now(), #{tradeAt})
+    </insert>
+
+<!--    查询账户余额-->
+    <select id="getAccountBalance">
+        SELECT id,user_id,balance FROM expense_account WHERE id = #{accountId} AND user_id = #{userId}
+    </select>
+<!--    更新账户余额-->
+    <update id="updateAccountBalance">
+        UPDATE expense_account SET balance = #{balance} WHERE id = #{accountId} AND user_id = #{userId}
+    </update>
+
+
+</mapper>
